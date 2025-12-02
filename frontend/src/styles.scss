@@ -1,0 +1,23 @@
+/* You can add global styles to this file, and also import other style files */
+/* ---------- beginner-friendly quick fix (paste into src/styles.scss) ---------- */
+
+/* 1) Keep layout from growing horizontally */
+html, body, app-root { overflow-x: hidden !important; }
+
+/* 2) Make the page wrapper flexible so content can shrink */
+.container-fluid.page-body-wrapper {
+  display: flex !important;
+  flex-direction: row !important;
+}
+
+/* 3) Let the routed content shrink (not the sidebar) */
+.container-fluid.page-body-wrapper > *:not(app-sidebar) {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+/* 4) Make tables and images safe (they won't blow up the width) */
+.table-responsive { overflow-x: auto; max-width: 100%; }
+img, svg, canvas { max-width: 100% !important; height: auto !important; display: block; }
+
+/* ---------------------------------------------------------------------------- */

@@ -1,0 +1,102 @@
+<div style="margin: 15px;">
+    <div class="header-row">
+        <button class="btn btn-primary" [routerLink]="['/deliveries/create']">
+            ➕ Create Deliveries
+        </button>
+    </div>
+</div>
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title mb-0">Deliveries List</h4>
+
+            <div *ngIf="loading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+
+            <div *ngIf="!loading && deliveries.length === 0" class="text-center py-5">
+                <p class="text-muted">No deliveries found</p>
+            </div>
+
+            <div *ngIf="!loading && deliveries.length > 0" class="table-responsive">
+                <table class="table table-striped narrow-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Partner</th>
+                            <th>Pickup Date</th>
+                            <th>Delivered Date</th>
+                            <th>Delivery Time</th>
+                            <th>Delivery Address</th>
+                            <th>Sender's Name</th>
+                            <th>Receiver's Name</th>
+                            <th>Status</th>
+                            <th *ngIf="isAdmin">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let d of deliveries">
+                            <td>{{ d.product?.name || '—' }}</td>
+                            <td>{{ d.assignedPartner?.name || '—' }}</td>
+                            <td>{{ d.pickupDate | date:'short' }}</td>
+                            <td>{{ d.deliveredDate ? (d.deliveredDate | date:'short') : '—' }}</td>
+                            <td>{{ formatTime(d.deliveryTime) }}</td>
+                            <td>{{ d.deliveryAddress || '—' }}</td>
+                            <td>{{ d.sender?.firstName || '' }} {{ d.sender?.lastName || '' }}</td>
+                            <td>{{ d.receiver?.firstName || '' }} {{ d.receiver?.lastName || '' }}</td>
+                            <td>
+                                <span *ngIf="isDelivered(d)" class="badge badge-success">Delivered</span>
+                                <span *ngIf="isFailed(d)" class="badge badge-danger"
+                                    [title]="d.failureReason">Failed</span>
+                                <span *ngIf="isPending(d)" class="badge badge-warning">Pending</span>
+                            </td>
+                            <td *ngIf="isAdmin">
+                                <div *ngIf="showActions(d)" style="display: flex; flex-direction: column; gap: 5px;">
+                                    <button class="btn btn-success btn-sm" (click)="markAsDelivered(d)"
+                                        style="font-size: 10px;">
+                                        Delivered
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" (click)="openFailureModal(d)"
+                                        style="font-size: 10px;">
+                                        Not Delivered
+                                    </button>
+                                </div>
+                                <span *ngIf="!showActions(d)"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="showReasonModal" class="modal-overlay" (click)="closeFailureModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delivery Failed</h5>
+            </div>
+            <div class="modal-body">
+                <p><strong>Product:</strong> {{ selectedDelivery?.product?.name }}</p>
+                <p><strong>Address:</strong> {{ selectedDelivery?.deliveryAddress }}</p>
+                <div class="form-group">
+                    <label>Reason for failure</label>
+                    <textarea class="form-control" rows="4" [(ngModel)]="failureReason"
+                        placeholder="Enter reason why delivery could not be completed.....">
+                    </textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="closeFailureModal()">
+                    Cancel
+                </button><br>
+                <button type="button" class="btn btn-danger" (click)="submitFailure()">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

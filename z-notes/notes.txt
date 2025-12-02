@@ -1,0 +1,130 @@
+to install nest
+cli command to install globally --> npm i -g @nestjs/cli     -->nest new project-name
+//////////////////////////////////////////////////////////////
+the concept of controller(controllers handle http requests)
+to generate a controller (nest generate controller controller-name)
+
+import { Controller } from '@nestjs/common';
+@Controller('user')
+
+export class UserController {} will be pre given code where--
+@Controller is a decorator (special function) that tells the class(which will be made by the dev) to be treated as a controller and http methods can be used in that class
+
+import { Controller, Get } from '@nestjs/common';
+
+@Controller('user')
+export class UserController {
+  @Get()  //@Get decorator 
+  getUser() {  //function inside a class a k a method; the controller tells that this method will be used when get request is made using localhost:3000/user
+    return 'user data fetched successfully'; so if i do localhost:3000/user GET request it will return user data fetched successfully 
+  } 
+}
+why user -- because of @Controller('user')
+////////////////////////////////////////////////////////////////////////
+
+concept of services and usage of controller and service together
+
+to generate a service nest generate service service-name
+import { Injectable } from '@nestjs/common';
+
+@Injectable() //here injectable decorator tells the following calss (ProductService) is a service and can be injected anywhere required (mostly with controllers)
+export class ProductService {}
+
+example usage of service with controller 
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class ProductService {
+  private products = [  //private means the variable products can only be accessed withtin the class
+    { id: 1, name: 'laptop', brand: 'lenovo', price: 56000 },
+    { id: 2, name: 'laptop', brand: 'asus', price: 76000 },
+    { id: 3, name: 'mobile', brand: 'samsung', price: 60000 },
+  ];
+  getAllProducts() { //a method is created
+    return this.products;
+  }
+  getProductById(id: number) { // method created to get products by id //parameter :id is given with data type number
+    return this.products.find((product) => product.id === id);
+  }
+}
+
+import { Controller, Get, Param } from '@nestjs/common';
+import { ProductService } from './product.service';
+
+@Controller('product')
+export class ProductController {
+  constructor(private readonly productService: ProductService) {} //here in constructor we have declared a private variable productService that contains the value of (the instance of OR points to)ProductService (the service class we have created)
+  @Get()
+  getProducts() {
+    return this.productService.getAllProducts();//this will return all products
+  }
+  @Get(':id') 
+  getProduct(@Param('id') id: string) {// here as we had given parameter id in service as we wanted the values by providing the id we will use@Param and as we know that url have only string value but our id is of type number so we will typecast by usingNumber(id)
+    return this.productService.getProductById(Number(id));
+  }
+}
+/////////////////////////////////////////////////
+
+concept of module in nest 
+in nest js to have a clean code structure we have the concept of modules 
+it acts as a container that contails services and controllers -->
+ to generate a module 
+ nest g module module-name
+
+ import { Module } from '@nestjs/common';
+import { EmployeeService } from './employee.service';
+import { EmployeeController } from './employee.controller';
+
+@Module({
+  providers: [EmployeeService],//in providers we get services made by user  (nest g service employee)
+  controllers: [EmployeeController],//in controllers we get controllers made by user (nest g controller employee)
+})
+export class EmployeeModule {}
+
+nest js have a parent module named app.module.ts inside the imports   imports: [EmployeeModule], the module made by dev. must be imported (important)
+
+GET: Used to read or fetch data.
+POST: Used to create new data.
+PUT: Used to update existing data completely.
+PATCH: Used to partially update existing data.
+DELETE: Used to remove data.
+
+
+REST
+Representational State Transfer
+it’s a set of design principles / architectural style for designing networked APIs, especially web APIs.
+REST API = API that uses standard HTTP methods (GET, POST, PUT, PATCH, DELETE)
+
+works with resources (data)
+sends/receives data mostly in JSON
+is stateless (no memory of previous request on the server side)
+
+ERROR CODES 
+
+Client Errors
+| Exception Class                              | HTTP Code | Meaning / When to Use                                                                                |
+| -------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------- |
+| **BadRequestException**             | 400       | Input validation failed, missing required data, malformed request body                               |
+| **UnauthorizedException**          | 401       | Authentication required or invalid credentials (like missing/invalid JWT)                            |
+| **ForbiddenException**               | 403       | Authenticated but not allowed to perform this action (e.g. normal user trying to access admin route) |
+| **NotFoundException**               | 404       | Resource not found (e.g. user with ID doesn’t exist)                                                 |
+| **MethodNotAllowedException**| 405       | HTTP method not supported for this endpoint                                                          |
+| **NotAcceptableException**       | 406       | Response format not acceptable by client (rarely used)                                               |
+| **RequestTimeoutException**     | 408       | Request took too long to process                                                                     |
+| **ConflictException**                  | 409       | Conflict with existing data (like trying to create duplicate user/email)                             |
+| **GoneException**                      | 410       | Resource no longer available (e.g. deleted or outdated)                                              |
+| **PayloadTooLargeException**      | 413       | Request body too large (like huge file uploads)                                                      |
+| **UnsupportedMediaTypeException** | 415       | Unsupported `Content-Type` (like sending XML when only JSON is supported)                            |
+| **UnprocessableEntityException**  | 422       | Validation passed syntactically, but logically invalid data                                          |
+| **TooManyRequestsException**      | 429       | Rate limiting — client sending too many requests in short time                                       |
+
+
+Server Errors
+
+| Exception Class                                | HTTP Code | Meaning / When to Use                                              |
+| ----------------------------------------| --------- | ------------------------------------------------------------------ |
+| **InternalServerErrorException** | 500       | Unexpected server crash / bug / DB failure                         |
+| **NotImplementedException**       | 501       | Endpoint not implemented yet                                       |
+| **BadGatewayException**              | 502       | Server acting as gateway got invalid response from another service |
+| **ServiceUnavailableException**   | 503       | Server temporarily overloaded or under maintenance                 |
+| **GatewayTimeoutException**      | 504       | Upstream service didn’t respond in time                            |

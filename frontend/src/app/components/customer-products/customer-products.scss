@@ -1,0 +1,119 @@
+/* Grid container */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 22px;
+  padding: 20px;
+}
+
+/* Card design */
+.product-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+  cursor: pointer;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* Image wrapper */
+.image-wrapper {
+  width: 100%;
+  height: 180px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.product-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Name */
+.product-card h3 {
+  margin: 8px 0;
+  font-size: 20px;
+  font-weight: 650;
+}
+
+/* Price */
+.price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #009688;
+  margin-bottom: 10px;
+}
+
+/* Description */
+.description {
+  font-size: 14px;
+  color: #666;
+  min-height: 42px;
+  margin-bottom: 10px;
+}
+
+/* Stock label */
+.stock {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.stock.out-of-stock {
+  color: #d32f2f;
+}
+
+/* Add to Cart button */
+.btn-add {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  transition: 0.25s;
+  font-weight: 600;
+}
+
+.btn-add:hover:not(:disabled) {
+  background-color: #1976d2;
+}
+
+.btn-add:disabled {
+  background: #bdbdbd;
+  cursor: not-allowed;
+}
+
+/* Loading & Empty */
+.loading,
+.empty {
+  text-align: center;
+  padding: 40px 10px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #666;
+}
+
+
+.wishlist-icon {
+  font-size: 22px; /* icon size */
+  cursor: pointer;
+  margin-left: 12px; /* button se distance */
+  vertical-align: middle; /* proper alignment in same line */
+  transition: transform 0.2s ease-in-out;
+}
+
+.wishlist-icon:hover {
+  transform: scale(1.2); /* optional cool hover effect */
+}
+

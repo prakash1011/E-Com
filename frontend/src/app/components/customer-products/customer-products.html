@@ -1,0 +1,38 @@
+<div *ngIf="loading" class="loading">
+    Loading products...
+</div>
+
+<div *ngIf="!loading && products.length === 0" class="empty">
+    No products available.
+</div>
+
+<div class="product-grid" *ngIf="!loading && products.length > 0">
+    <div class="product-card" *ngFor="let p of products">
+        <div class="image-wrapper" *ngIf="p.imageUrl">
+            <img [src]="getImageUrl(p)" [alt]="p.name" />
+        </div>
+
+        <h3>{{ p.name }}</h3>
+        <p class="price">₹ {{ p.price }}</p>
+
+        <p class="description">
+            {{ p.description || 'No description' }}
+        </p>
+
+        <p class="stock" [class.out-of-stock]="p.quantity <= 0">
+            {{ p.quantity > 0 ? 'In stock: ' + p.quantity : 'Out of stock' }}
+        </p>
+
+
+        <div style="display: flex; gap:10px; align-items: center;">
+            <button class="btn-add" (click)="addToCart(p)" [disabled]="p.quantity <= 0">
+                Add to Cart
+            </button>
+
+<i (click)="toggleHeart(p)" class="fa-heart wishlist-icon" [class.fa-regular]="!isProductWishlisted(p)"
+    [class.fa-solid]="isProductWishlisted(p)" [style.color]="isProductWishlisted(p) ? 'red' : 'black'">
+</i>
+
+        </div>
+    </div>
+</div>

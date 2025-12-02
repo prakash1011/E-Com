@@ -1,0 +1,111 @@
+npm i @nestjs/passport passport passport-local passport-jwt
+npm i -D @types/passport-local @types/passport-jwt
+npm i bcrypt
+
+src/
+  auth/
+    auth.module.ts
+    auth.service.ts
+    auth.controller.ts
+    local.strategy.ts
+    jwt.strategy.ts
+    jwt.guard.ts         // optional (or use AuthGuard('jwt') directly)
+    dtos/
+      login.dto.ts
+  users/
+    users.module.ts
+    users.service.ts
+    users.entity.ts      // TypeORM entity (email, password hash, role etc.)
+
+// src/auth/auth.module.ts
+import { Module } from '@nestjs/common';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthService } from './auth.service';
+import { UsersModule } from 'src/users/users.module';
+import { LocalStrategy } from './local.strategy';
+import { JwtStrategy } from './jwt.strategy';
+import { AuthController } from './auth.controller';
+
+@Module({
+  imports: [
+    UsersModule,
+    PassportModule, // register() optional; default sessionless
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'dev_secret', // .env me rakhna best
+      signOptions: { expiresIn: '1d' },
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
+  exports: [AuthService],
+})
+export class AuthModule {}
+   WE CAN ALSO USE CONFIG MODULE
+
+ @Module({
+  imports: [
+    ConfigModule.forRoot(), // ensure env is loaded globally
+    PassportModule, // passport by default sessionless hota hai
+    JwtModule.registerAsync({
+      imports: [ConfigModule], // ConfigModule inject karne ke liye
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
+        secret: config.get<string>('JWT_SECRET'), // ✅ env se via ConfigService
+        signOptions: {
+          expiresIn: config.get<string>('JWT_EXPIRY') || '1d',
+        },
+      }),
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
+  exports: [AuthService],
+})
+export class AuthModule {}
+
+// src/auth/local.strategy.ts
+import { Strategy } from 'passport-local';
+import { PassportStrategy } from '@nestjs/passport';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from './auth.service';
+
+@Injectable()
+export class LocalStrategy extends PassportStrategy(Strategy) {
+  constructor(private authService: AuthService) {
+    // Default usernameField = 'username'
+    // Hum email use karna chahte hai:
+    super({ usernameField: 'email' });
+  }
+
+  async validate(email: string, password: string) {
+    const user = await this.authService.validateUser(email, password);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+    // jo return hota hai, wo request.user me attach hota hai
+    return user;
+  }
+}
+
+// src/auth/jwt.strategy.ts
+import { Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor() {
+    super({
+      secretOrKey: process.env.JWT_SECRET || 'dev_secret',
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+    });
+  }
+
+  async validate(payload: { sub: number; email: string; role?: string }) {
+    // yahan se return jo karoge, woh request.user ban jaayega
+    return payload; // minimal; ya DB se fresh user bhi laa sakte ho
+  }
+}
+
+
+// npx kill-port 4200   

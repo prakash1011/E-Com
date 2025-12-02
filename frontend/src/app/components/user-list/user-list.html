@@ -1,0 +1,28 @@
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Partner Name</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>settings</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let u of users">
+                <td>{{ u.id }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.roles?.roleName }}</td>
+                <td>{{ u.partner?.name || '-' }}</td>
+                <td>{{ u.partner?.phoneNo || '-' }}</td>
+                <td>{{ u.partner?.address || '-' }}</td>
+                <td><i class="mdi mdi-pencil mdi-24px text-success" style="margin-right: 5px; cursor:pointer"></i>
+                    <i class="mdi mdi-window-close mdi-24px text-danger" style="cursor:pointer"></i>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

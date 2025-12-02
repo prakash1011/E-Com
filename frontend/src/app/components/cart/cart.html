@@ -1,0 +1,71 @@
+<div *ngIf="loading" class="text-center mt-4">
+    <h4>Loading cart...</h4>
+</div>
+
+<div *ngIf="!loading && cart.items.length === 0" class="text-center mt-4">
+    <h3>Your cart is empty</h3>
+    <button class="btn btn-primary mt-2" [routerLink]="['/customer/products']">
+        Continue Shopping
+    </button>
+</div>
+
+<div *ngIf="!loading && cart.items.length > 0" class="container mt-3">
+
+    <h2 class="mb-3">Your Cart</h2>
+
+    <div class="cart-item mb-3 p-3 border rounded shadow-sm" *ngFor="let item of cart.items">
+        <div class="d-flex align-items-start gap-3">
+
+            <img *ngIf="item.product" [src]="getImageUrl(item.product)" [alt]="item.product?.name"
+                class="rounded cart-img" />
+
+            <div class="flex-grow-1">
+                <h5 class="mb-1">{{ item.product?.name }}</h5>
+
+                <p class="text-muted mb-2">
+                    Price:
+                    <strong>₹ {{ item.product?.price }}</strong>
+                </p>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-secondary" (click)="decreaseQty(item)">
+                        -
+                    </button>
+
+                    <span class="fs-5 px-2">{{ item.quantity }}</span>
+
+                    <button class="btn btn-sm btn-outline-secondary" (click)="increaseQty(item)">
+                        +
+                    </button>
+                </div>
+
+                <p class="mt-2 mb-0 fw-semibold">
+                    Subtotal: ₹ {{ (item.product?.price || 0) * item.quantity }}
+                </p>
+            </div>
+
+            <button class="btn btn-sm btn-danger ms-2" (click)="remove(item)">
+                X
+            </button>
+        </div>
+    </div>
+
+    <div class="p-3 border rounded shadow-sm mt-3">
+        <h4 class="mb-3">
+            Total:
+            <span class="text-success">
+                ₹ {{ getTotal() }}
+            </span>
+        </h4>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-warning" (click)="clearCart()">
+                Clear Cart
+            </button>
+
+            <button class="btn btn-success ms-auto">
+                Checkout
+            </button>
+        </div>
+    </div>
+</div>

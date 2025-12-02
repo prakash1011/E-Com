@@ -1,0 +1,38 @@
+/* Wrapper spacing */
+.action-wrapper {
+  margin: 15px;
+}
+
+/* Align button to right */
+.header-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Button styling */
+.header-row .btn-primary {
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(180deg, #2563eb, #1e40af);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  transition: 0.15s ease-in-out;
+}
+
+/* Hover */
+.header-row .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25);
+}
+
+/* Mobile: full width button */
+@media (max-width: 768px) {
+  .header-row .btn-primary {
+    width: 100%;
+    text-align: center;
+  }
+}

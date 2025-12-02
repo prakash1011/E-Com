@@ -1,0 +1,186 @@
+STEP 1--install toaster and animation (latest version)
+
+npm i ngx-toastr @angular/animations
+---------------------------------------------------------------------------------------
+STEP 2--in main.ts provide animations and Toastr - (toastr will have positionClass timeOut progressBar closeButton preventDuplicates)
+
+import { bootstrapApplication } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideToastr } from 'ngx-toastr';
+import { AppComponent } from './app/app.component';
+import { routes } from './app/app.routes';
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter(routes),
+    provideHttpClient(),
+    provideAnimations(),  // or provideNoopAnimations() if you want to disable animations
+    provideToastr({
+      positionClass: 'toast-bottom-right',
+      timeOut: 3000,
+      progressBar: true,
+      closeButton: true,
+      preventDuplicates: true,
+    }),
+  ],
+}).catch(console.error);
+-----------------------------------------------------------------------------------------------------------
+STEP3--in styles.css @use the styles as it's compulsary
+
+@use 'ngx-toastr/toastr'; // ✅ modern Sass syntax (replaces @import)
+.toast-container {
+  z-index: 2147483647 !important; // ensures it's above modals
+}
+------------------------------------------------------------------------------------------------------
+STEP4--to use it in a particular component 
+
+import { Component } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+
+@Component({
+  selector: 'app-login',
+  standalone: true,
+  templateUrl: './login.component.html',
+})
+export class LoginComponent {
+  constructor(private toastr: ToastrService) {}
+
+  showSuccess() {
+    this.toastr.success('Logged in successfully!', 'Welcome 👋');
+  }
+
+  showError() {
+    this.toastr.error('Invalid credentials', 'Login failed');
+  }
+
+  showWarning() {
+    this.toastr.warning('Please check the form', 'Validation');
+  }
+
+  showInfo() {
+    this.toastr.info('New update available');
+  }
+}
+------------------------------------------------------------------------------
+STEP5--Best practices (for clean usage)
+
+toast.service
+
+import { Injectable } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+
+@Injectable({ providedIn: 'root' })
+export class Toast {
+  constructor(private toastr: ToastrService) {}
+
+  success(msg: string, title?: string) {
+    this.toastr.success(msg, title || 'Success');
+  }
+
+  error(msg: string, title?: string) {
+    this.toastr.error(msg, title || 'Error');
+  }
+
+  info(msg: string, title?: string) {
+    this.toastr.info(msg, title || 'Info');
+  }
+
+  warn(msg: string, title?: string) {
+    this.toastr.warning(msg, title || 'Warning');
+  }
+}
+-------------------------------------------------------------------------------------
+ STEP 6--to inject it anywhere 
+
+ constructor(private toast: Toast) {}
+this.toast.success('User created!');
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+the way i have used it 
+
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  ReactiveFormsModule,
+  FormGroup,
+  FormControl,
+  Validators,
+} from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+
+@Component({
+  selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule], // HttpClientModule not needed now
+  templateUrl: './login.html',
+  styleUrls: ['./login.scss'],
+})
+export class Login {
+  loginForm = new FormGroup({
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(6),
+    ]),
+  });
+
+  isSubmitting = false;
+  loginError = '';
+
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
+
+  get email() {
+    return this.loginForm.get('email')!;
+  }
+  get password() {
+    return this.loginForm.get('password')!;
+  }
+
+  onSubmit() {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      this.toastr.warning('Please fill the form correctly', 'Validation');
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.loginError = '';
+
+    const credentials = this.loginForm.value as {
+      email: string;
+      password: string;
+    };
+
+    this.http
+      .post<{ access_token: string; user: any }>(
+        'http://localhost:3000/auth/login',
+        credentials
+      )
+      .subscribe({
+        next: (res) => {
+          localStorage.setItem('token', res.access_token);
+          this.toastr.success('Login successful!', 'Welcome 👋');
+          this.isSubmitting = false;
+          this.router.navigateByUrl('/dashboard'); // ✅ matches route
+        },
+        error: (err) => {
+          const msg =
+            err?.error?.message || 'Invalid credentials. Please try again.';
+          this.loginError = msg;
+          this.toastr.error(msg, 'Login Failed');
+          this.isSubmitting = false;
+        },
+      });
+  }
+}
+------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,9 @@
+<div class="container-scroller">
+    <app-navbar></app-navbar>
+    <div class="container-fluid page-body-wrapper">
+        <app-sidebar *ngIf="!isCustomer"></app-sidebar>
+        <div class="main-panel">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,64 @@
+<div style="margin: 15px;">
+  <div class="header-row">
+    <button class="btn btn-primary" [routerLink]="['/products/create']">
+      ➕ Create Products
+    </button>
+  </div>
+</div>
+
+
+<div class="col-lg-12 grid-margin stretch-card">
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title mb-0">Products List</h4>
+      <!-- Header Row -->
+
+
+      <!-- Loading Spinner -->
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && products.length === 0" class="text-center py-5">
+        <p class="text-muted">No products found</p>
+      </div>
+
+      <!-- Products Table -->
+      <div *ngIf="!loading && products.length > 0" class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th *ngIf="isAdmin">Assigned Partner</th>
+              <!-- <th>Created By</th> -->
+              <th>Created At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of products">
+              <td>
+                <img [src]="'http://localhost:3000' + product.imageUrl" alt="{{product.name}}" class="product-image">
+              </td>
+              <td>{{product.name}}</td>
+              <td>₹{{product.price}}</td>
+              <td>{{product.quantity}}</td>
+              <td *ngIf="isAdmin">{{product.assignedPartner?.name || '-'}}</td>
+              <!-- <td>{{product.createdBy.email || '-'}}</td> -->
+              <td>{{product.createdAt | date:'short'}}</td>
+              <td>
+                <i class="mdi mdi-pencil mdi-24px text-success" style="margin-right: 5px; cursor:pointer"></i>
+                <i class="mdi mdi-window-close mdi-24px text-danger" style="cursor:pointer"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
