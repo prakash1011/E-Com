@@ -7,16 +7,18 @@ import { HttpClient } from '@angular/common/http';
   selector: 'app-users',
   imports: [CommonModule],
   templateUrl: './user-list.html',
-  styleUrls:['./user-list.scss']
+  styleUrls: ['./user-list.scss'],
 })
+
 export class UserList {
   users: any[] = [];
   loading = false;
-  private readonly API = 'http://localhost:3000/users'; 
+  private readonly API = 'http://localhost:3000/users';
   constructor(private http: HttpClient) {}
   ngOnInit() {
     this.load();
   }
+
   load(withDeleted = false) {
     this.loading = true;
     const url = withDeleted ? `${this.API}?withDeleted=true` : this.API;

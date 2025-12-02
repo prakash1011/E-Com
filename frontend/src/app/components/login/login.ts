@@ -13,7 +13,7 @@ import { WishlistService } from '../../wishlist/wishlist';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, CommonModule,RouterModule],
+  imports: [ReactiveFormsModule, CommonModule, RouterModule],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -52,7 +52,6 @@ export class Login {
 
     this.auth.login(credentials).subscribe({
       next: (res) => {
-        // assuming auth.login returns { access_token, user }
         if (res?.access_token) {
           localStorage.setItem('jwt_token', res.access_token);
 
@@ -63,8 +62,6 @@ export class Login {
           } catch (e) {
             console.error('Error decoding token in login', e);
           }
-
-          // ⭐ agar customer hai to wishlist sync karo
           if (role === 'customer') {
             const raw = localStorage.getItem('wishlist');
             if (raw) {
@@ -79,7 +76,7 @@ export class Login {
                 this.wishlistService.sync(ids).subscribe({
                   next: () => {
                     console.log('Wishlist synced after login');
-                    // optional: localStorage.removeItem('wishlist');
+                    localStorage.removeItem('wishlist');
                     this.router.navigate(['/dashboard']);
                   },
                   error: (err) => {
@@ -93,7 +90,6 @@ export class Login {
           }
         }
 
-        // default navigate
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
